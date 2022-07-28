@@ -286,7 +286,8 @@ class ChromiumBased:
         if not cookie_file:
                 raise BrowserCookieError('Failed to find {} cookie'.format(self.browser))
 
-        self.tmp_cookie_file = create_local_copy(cookie_file)
+        #self.tmp_cookie_file = create_local_copy(cookie_file)
+        self.cookie_file = cookie_file
 
     def __del__(self):
         # remove temporary backup of sqlite cookie database
@@ -298,7 +299,8 @@ class ChromiumBased:
 
     def load(self):
         """Load sqlite cookies into a cookiejar"""
-        con = sqlite3.connect(self.tmp_cookie_file)
+        #con = sqlite3.connect(self.tmp_cookie_file)
+        con = sqlite3.connect(self.cookie_file)
         con.text_factory = text_factory
         cur = con.cursor()
         try:
@@ -591,7 +593,8 @@ class Firefox:
     def __init__(self, cookie_file=None, domain_name=""):
         self.tmp_cookie_file = None
         cookie_file = cookie_file or self.find_cookie_file()
-        self.tmp_cookie_file = create_local_copy(cookie_file)
+        self.cookie_file = cookie_file
+        #self.tmp_cookie_file = create_local_copy(cookie_file)
         # current sessions are saved in sessionstore.js
         self.session_file = os.path.join(
             os.path.dirname(cookie_file), 'sessionstore.js')
@@ -705,7 +708,8 @@ class Firefox:
                     cj.set_cookie(Firefox.__create_session_cookie(cookie))
 
     def load(self):
-        con = sqlite3.connect(self.tmp_cookie_file)
+        #con = sqlite3.connect(self.tmp_cookie_file)
+        con = sqlite3.connect(self.cookie_file)
         cur = con.cursor()
         cur.execute('select host, path, isSecure, expiry, name, value, isHttpOnly from moz_cookies '
                     'where host like ?', ('%{}%'.format(self.domain_name),))
